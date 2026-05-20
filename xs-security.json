@@ -1,0 +1,73 @@
+{
+ "xsappname": "LeaveRequest",
+ "tenant-mode": "dedicated",
+ "scopes": [
+  {
+   "name": "$XSAPPNAME.Leave.Read",
+   "description": "Read Leave Requests"
+  },
+  {
+   "name": "$XSAPPNAME.Leave.Write",
+   "description": "Write Leave Request"
+  },
+  {
+   "name": "$XSAPPNAME.Leave.Approve",
+   "description": "Approve Leave Requests"
+  },
+  {
+   "name": "$XSAPPNAME.Travel.Read",
+   "description": "Read Travel Request"
+  },
+  {
+   "name": "$XSAPPNAME.Travel.Write",
+   "description": "Write Travel Request"
+  },
+  {
+   "name": "$XSAPPNAME.Travel.Approve",
+   "description": "Approve Travel Request"
+  },
+  {
+   "name": "$XSAPPNAME.Admin.All",
+   "description": "Full Access"
+  }
+ ],
+ "attributes": [],
+ "role-templates": [
+  {
+   "name": "Employee ",
+   "description": "Employee Role",
+   "scope-references": [
+    "$XSAPPNAME.Leave.Read",
+    "$XSAPPNAME.Leave.Write",
+    "$XSAPPNAME.Travel.Read",
+    "$XSAPPNAME.Travel.Write"
+   ]
+  },
+  {
+   "name": "Manager",
+   "description": "Manager Role",
+   "scope-references": [
+    "$XSAPPNAME.Leave.Read",
+    "$XSAPPNAME.Leave.Write",
+    "$XSAPPNAME.Leave.Approve",
+    "$XSAPPNAME.Travel.Read",
+    "$XSAPPNAME.Travel.Write",
+    "$XSAPPNAME.Travel.Approve"
+   ]
+  },
+  {
+   "name": "Admin",
+   "description": "Full Access",
+   "scope-references": [
+    "$XSAPPNAME.Admin.All",
+     "$XSAPPNAME.Leave.Read",
+    "$XSAPPNAME.Leave.Write",
+    "$XSAPPNAME.Leave.Approve",
+
+    "$XSAPPNAME.Travel.Read",
+    "$XSAPPNAME.Travel.Write",
+    "$XSAPPNAME.Travel.Approve"
+   ]
+  }
+ ]
+}

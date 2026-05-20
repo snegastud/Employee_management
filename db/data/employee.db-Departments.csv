@@ -1,0 +1,6 @@
+ID,deptCode,deptName,budgetLimit,departmentEmail
+550e8400-e29b-41d4-a716-446655440101,IT001,Information Technology,25000,it@gmail.com
+550e8400-e29b-41d4-a716-446655440102,HR001,Human Resources,15000,hr@gmail.com
+550e8400-e29b-41d4-a716-446655440103,FIN001,Finance,30000,finance@gmail.com
+550e8400-e29b-41d4-a716-446655440104,OPS001,Operations,20000,operations@gmail.com
+550e8400-e29b-41d4-a716-446655440105,MKT001,Marketing,18000,marketing@gmail.com

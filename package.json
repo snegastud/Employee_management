@@ -1,0 +1,34 @@
+{
+  "name": "travelRequest",
+  "version": "1.0.0",
+  "dependencies": {
+    "@sap/cds": "^9",
+    "@sap/xssec": "^4.13.0",
+    "passport": "^0.7.0"
+  },
+  "devDependencies": {
+    "@cap-js/sqlite": "^2.4",
+    "cds-plugin-ui5": "^0.13.0"
+  },
+  "scripts": {
+    "start": "cds-serve",
+    "watch-employee": "cds watch --open employee/index.html?sap-ui-xx-viewCache=false --livereload false",
+    "watch-project1": "cds watch --open project1/index.html?sap-ui-xx-viewCache=false --livereload false"
+  },
+  "private": true,
+  "cds": {
+    "requires": {
+      "auth": "mocked",
+      "[production]": {
+        "auth": "xsuaa"
+      }
+    }
+  },
+  "workspaces": [
+    "app/*"
+  ],
+  "sapux": [
+    "app/employee",
+    "app/project1"
+  ]
+}
