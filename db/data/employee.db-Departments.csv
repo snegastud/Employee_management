@@ -1,6 +1,11 @@
 ID,deptCode,deptName,budgetLimit,departmentEmail
-550e8400-e29b-41d4-a716-446655440101,IT001,Information Technology,25000,it@gmail.com
-550e8400-e29b-41d4-a716-446655440102,HR001,Human Resources,15000,hr@gmail.com
-550e8400-e29b-41d4-a716-446655440103,FIN001,Finance,30000,finance@gmail.com
-550e8400-e29b-41d4-a716-446655440104,OPS001,Operations,20000,operations@gmail.com
-550e8400-e29b-41d4-a716-446655440105,MKT001,Marketing,18000,marketing@gmail.com
+550e8400-e29b-41d4-a716-446655440101,IT001,Information Technology,25000,it@company.com
+550e8400-e29b-41d4-a716-446655440102,HR001,Human Resources,15000,hr@company.com
+550e8400-e29b-41d4-a716-446655440103,FIN001,Finance,30000,finance@company.com
+550e8400-e29b-41d4-a716-446655440104,MKT001,Marketing,20000,marketing@company.com
+550e8400-e29b-41d4-a716-446655440105,OPS001,Operations,35000,operations@company.com
+550e8400-e29b-41d4-a716-446655440106,ADM001,Administration,12000,admin@company.com
+550e8400-e29b-41d4-a716-446655440107,QA001,Quality Assurance,18000,qa@company.com
+550e8400-e29b-41d4-a716-446655440108,DEV001,Development,45000,dev@company.com
+550e8400-e29b-41d4-a716-446655440109,SAL001,Sales,28000,sales@company.com
+550e8400-e29b-41d4-a716-446655440110,SUP001,Support,16000,support@company.com
