@@ -3,6 +3,7 @@ namespace employee.db;
 entity Employees {
 key ID :UUID;
 @assert.unique
+
 empNo: String(100);
 empName: String(100);
 @assert.format: '^[^@]+@[^@]+\\.[^@]+$'
@@ -54,15 +55,18 @@ entity LeaveRequest{
 key ID:UUID;
 @assert.unique
 employeeLeaveRequest:Association to Employees ;
-leaveStartDate:Date @mandatory;
-leaveEndDate:Date @mandatory;
+leaveStartDate:Date ;
+leaveEndDate:Date ;
+leaveStatusCriticality : Integer;
+@readonly
 rejectionReason : String(255);
+SeatingArrangement : String;
 leaveType:Association to LeaveType ;
 leaveStatus:Association to Status ;
 @assert.range: [1,30]
 @readonly
-numberOfDays:Integer @mandatory;
-@mandatory
+numberOfDays:Integer ;
+
 leaveReason:String(255);
 @readonly
 leaveBalanceBefore:Integer;
@@ -151,3 +155,4 @@ entity AuditLogs{
    
     createdAt : Timestamp;
 }
+

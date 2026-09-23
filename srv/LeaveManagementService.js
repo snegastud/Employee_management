@@ -1,9 +1,23 @@
 const cds =require('@sap/cds');
 
-module.exports=cds.service.impl(function async(){
+const axios = require('axios');
 
-    const {Employees, Departments,LeaveRequest,AuditLogs } =this.entities;
+module.exports=cds.service.impl(async function(){
+    
+     const {Employees, Departments,LeaveRequest,AuditLogs, PendingLeaveRequests, } =this.entities;
 
+  
+   this.on('READ', 'States', async (req) => {
+
+ 
+
+    const result = await axios.get(
+        `https://81a21727trial-dev-countryexternalapi-srv.cfapps.us10-001.hana.ondemand.com/odata/v4/country-external-api/getStates(stateCode='IN')`
+    );
+
+    return result.data.value;
+});
+    
 
     this.before('submitLeaveRequest',async(req)=>{
 
@@ -11,7 +25,7 @@ module.exports=cds.service.impl(function async(){
 
        
 
-       const { employeeID, startDate, endDate,leaveType_leave,reason } = req.data;
+       const { employeeID, startDate, endDate,leaveType_leave,reason,SeatingArrangement } = req.data;
 
         if(!employeeID){
             return req.error(400,"EmployeeID is required");
@@ -44,6 +58,10 @@ module.exports=cds.service.impl(function async(){
             return req.error(400,"Select the type of leave");
         }
    
+        if(!SeatingArrangement){
+
+            return req.warn(400,"Please select you seating arrangement ")
+        }
 
         if(!reason){
 
@@ -89,7 +107,7 @@ module.exports=cds.service.impl(function async(){
 
         console.log("who can enter",req.user);
 
-        const {employeeID,startDate,endDate,leaveType_leave,reason}=req.data;
+        const {employeeID,startDate,endDate,leaveType_leave,reason,SeatingArrangement}=req.data;
 
        
         
@@ -106,21 +124,32 @@ module.exports=cds.service.impl(function async(){
         leaveType_leave:leaveType_leave,
 
         numberOfDays: req.data.numberOfDays,
+
+        
+        leaveStatus_status: 'PENDING',
+
+        leaveStatusCriticality: 2,
+
+
+        SeatingArrangement:SeatingArrangement,
+
+   
+
         
         leaveReason: reason
 
         });
     
-        
+        console.log(data)
       
         const value =await SELECT.one.from(LeaveRequest).where({employeeLeaveRequest_ID: EmpId.ID });;
 
         console.log(value);
 
-        return value;
+        return  req.info(`Leave request sumbited ${employeeID} successfully`);
     })
 
-    this.on('approveLeave',async(req)=>{
+    this.on('approveLeave','PendingLeaveRequests',async(req)=>{
 
     console.log("Approve triggered");
 
@@ -182,11 +211,14 @@ module.exports=cds.service.impl(function async(){
         await UPDATE(LeaveRequest)
         .set({
             leaveStatus_status: 'APPROVED',
-            approver_ID: approver.ID,
+            
+            leaveStatusCriticality: 3,
+            approver_ID: approver.empName,
             numberOfDays: days,
             leaveBalanceBefore: employee.leaveBalance,
-            leaveBalanceAfter: newBalance
-
+            leaveBalanceAfter: newBalance,
+            
+   
         }).where({ ID: leaveID });
 
 
@@ -205,11 +237,11 @@ module.exports=cds.service.impl(function async(){
 
          console.log(newLeave);
 
-        return { message: "Leave Approved" };
+        return req.info(`Leave approved ${leaveID} successfully`)
 
     })
 
-    this.on('rejectLeave',async(req)=>{
+    this.on('rejectLeave' ,'PendingLeaveRequests',async(req)=>{
 
         console.log(req.params[0]);
 
@@ -255,8 +287,9 @@ module.exports=cds.service.impl(function async(){
         
         const rejectUpdate=  await UPDATE(LeaveRequest).set({
 
-            leaveStatus_status: 'REJECTED', 
-            approver_ID:manager.ID,
+            leaveStatus_status: 'REJECTED',
+            leaveStatusCriticality: 1, 
+            approver_ID:manager.empName,
             leaveBalanceBefore:employee.leaveBalance,
             leaveBalanceAfter: employee.leaveBalance,
             rejectionReason:Rejectionreason
@@ -276,7 +309,7 @@ module.exports=cds.service.impl(function async(){
 
         console.log("leaveStatus",LeaveStatus);
 
-        return LeaveStatus;
+        return req.info(`Leave Rejected ${leaveID} successfully`)
     
     })
 
@@ -303,9 +336,90 @@ module.exports=cds.service.impl(function async(){
 
         console.log(totalLeave)
 
-        return req.notify(`Employee leaveBalance ${totalLeave}`);
+        return req.info(`Employee leaveBalance ${totalLeave}`);
 
     })
+
+    this.on('cancelRequest', async (req) => {
+
+    console.log("Cancel Request Triggered");
+
+    console.log("User", req.user);
+
+    const { employeeID } = req.data;
+
+    if (!employeeID) {
+
+        return req.error(400, "Employee ID is required");
+    }
+
+    const employee = await SELECT.one .from(Employees).where({ empNo: employeeID });
+
+    console.log("Employee Details", employee);
+
+    if (!employee) {
+
+        return req.error(404, "Employee not found");
+    }
+
+    const leaveRaise = await SELECT.one .from(LeaveRequest) .where({employeeLeaveRequest_ID: employee.ID });
+
+    console.log("Leave Request Details", leaveRaise);
+
+    if (!leaveRaise) {
+
+        return req.error(404, "No leave request found");
+    }
+
+    if (leaveRaise.leaveStatus_status === 'CANCELLED') {
+
+        return req.error(409, "Leave already cancelled");
+    }
+
+    if (leaveRaise.leaveStatus_status === 'REJECTED') {
+
+        return req.error(409, "Rejected leave cannot be cancelled");
+    }
+
+    if (leaveRaise.leaveStatus_status === 'PENDING') {
+
+
+        await UPDATE(LeaveRequest).set({leaveStatus_status: 'CANCELLED', leaveStatusCriticality: 1  }).where({ ID: leaveRaise.ID });
+
+        await INSERT.into(AuditLogs).entries({action: 'CANCELLED',performedBy: employee.empName, createdAt: new Date()});
+
+        const cancelledLeave = await SELECT.one.from(LeaveRequest).where({ ID: leaveRaise.ID });
+
+        console.log("Cancelled Leave", cancelledLeave);
+
+        return req.info(`Pending leave cancelled successfully`);
+    }
+
+    if (leaveRaise.leaveStatus_status === 'APPROVED') {
+
+        const newBalance = employee.leaveBalance + leaveRaise.numberOfDays;
+
+        console.log("Refill Balance", newBalance);
+
+        await UPDATE(Employees) .set({  leaveBalance: newBalance}).where({ ID: employee.ID });
+
+        await UPDATE(LeaveRequest).set({ leaveStatus_status: 'CANCELLED',leaveStatusCriticality: 1,leaveBalanceAfter: newBalance}).where({ ID: leaveRaise.ID });
+
+        await INSERT.into(AuditLogs).entries({ action: 'CANCELLED', performedBy: employee.empName, createdAt: new Date()});
+
+        const updatedLeave = await SELECT.one.from(LeaveRequest).where({ ID: leaveRaise.ID });
+
+        console.log("Updated Leave", updatedLeave);
+
+        const updatedEmployee = await SELECT.one.from(Employees).where({ ID: employee.ID });
+
+        console.log("Updated Employee", updatedEmployee);
+
+        return req.info(`Approved leave cancelled successfully`);
+    }
+
+});
+    
 
 
 
