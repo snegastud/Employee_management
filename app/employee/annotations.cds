@@ -26,16 +26,24 @@ UI.HeaderInfo : {
 UI.LineItem:[
 
     { $Type : 'UI.DataFieldForAction',
-     Action : 'LeaveManagement.submitLeaveRequest',
+
+    Action : 'LeaveManagement.EntityContainer/submitLeaveRequest',
     Label : 'Submit Leave Request', 
     Inline : false
     },
 
     { $Type : 'UI.DataFieldForAction',
-     Action : 'LeaveManagement.cancelRequest',
-      Label : 'Cancel Request',
+     Action : 'LeaveManagement.EntityContainer/cancelRequest',
+     Label : 'Cancel Request',
      Inline : false 
      },
+
+      {
+        $Type : 'UI.DataFieldForAction',
+        Action : 'employees.rejectOnboarding',
+        Label : 'Reject Onboarding',
+        Inline : false
+    },
 
    
     {

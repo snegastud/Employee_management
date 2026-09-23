@@ -155,3 +155,4 @@ entity AuditLogs{
    
     createdAt : Timestamp;
 }
+

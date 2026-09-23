@@ -30,7 +30,7 @@ service LeaveManagement{
     
 
     entity LeaveType as projection on db.LeaveType;
-
+    
     
 
    
@@ -42,6 +42,8 @@ service LeaveManagement{
   { grant: 'READ', to: ['Employee', 'Manager', 'Admin'] }
    ]
     entity  LeaveRequest as projection on db.LeaveRequest;
+   
+
 
    @restrict: [
         { grant: 'READ', to: ['Manager', 'Admin'] }
